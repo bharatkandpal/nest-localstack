@@ -1,0 +1,11 @@
+{
+  "sourceRoot": "src/modules",
+  "generateOptions": {
+    "spec": false
+  },
+  "compilerOptions": {
+    "plugins": [
+      { "name": "@nestjs/swagger", "options": { "introspectComments": true } }
+    ]
+  }
+}
