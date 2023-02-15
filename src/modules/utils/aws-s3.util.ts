@@ -1,56 +1,48 @@
-import {
-  CreateBucketCommand,
-  CreateBucketCommandInput,
-  PutObjectCommand,
-  PutObjectCommandInput,
-} from '@aws-sdk/client-s3';
 import { Injectable, Logger } from '@nestjs/common';
-import { s3Client } from './s3.client';
-
+import { S3 } from 'aws-sdk';
 @Injectable()
 export class S3Util {
-  private logger = new Logger(S3Util.name);
-  async uploadFile(file) {
-    const { originalname } = file;
-    await this.s3_upload(
-      file.buffer,
-      process.env.AWS_S3_BUCKET,
-      originalname,
-      file.mimetype,
-    );
+  private readonly logger = new Logger(S3Util.name);
+  private readonly s3Client: S3;
+  constructor() {
+    this.s3Client = new S3({
+      region: process.env.AWS_REGION,
+      endpoint: process.env.DYNAMODB_URL,
+      s3ForcePathStyle: true,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
   }
-
-  async s3_upload(file, bucket, name, mimetype) {
-    const params: PutObjectCommandInput = {
-      Bucket: bucket,
-      Key: String(name),
-      Body: file,
+  async uploadFile(file) {
+    const params = {
+      Bucket: process.env.S3_BUCKET,
+      Key: String(file.originalname),
+      Body: file.buffer,
       ACL: 'public-read',
-      ContentType: mimetype,
+      ContentType: file.mimetype,
       ContentDisposition: 'inline',
     };
-
-    console.log(params);
-
     try {
-      const s3Response = await s3Client.send(new PutObjectCommand(params));
-      this.logger.log(s3Response);
+      const s3Response = await this.s3Client.upload(params).promise();
       return s3Response;
     } catch (e) {
-      console.log(e);
+      this.logger.error(e);
+      return e;
     }
   }
 
   async createBucket() {
-    const params: CreateBucketCommandInput = {
-      Bucket: process.env.AWS_S3_BUCKET,
-    };
     try {
-      const bucket = await s3Client.send(new CreateBucketCommand(params));
-      this.logger.log(bucket);
-      return bucket.Location;
+      const params = {
+        Bucket: process.env.S3_BUCKET,
+      };
+      const bucket = await this.s3Client.createBucket(params).promise();
+      return bucket;
     } catch (error) {
       this.logger.error(error);
+      return error;
     }
   }
 }
