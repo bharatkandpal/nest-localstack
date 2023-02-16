@@ -1,8 +1,25 @@
 # nest-localstack
 Implementation of some of the aws services with localstack
+We will be using aws-sdk v2 in this sample because of the limitation of free version of localstack
+Services implemented in this code:
+- S3
 
-## Pull localstack image from docker-hub
-`docker pull localstack/localstack`
+I have also added some common functionalities along the way, and will keep adding more:
+- Swagger doc
+- Logger Middleware
+- ...
+
+## Steps to run the code
+
+* Take latest pull
+* run `pnpm install` to install the dependencies
+* setup localstack server with docker on your machine (steps listed in localstack section)
+* Start the server `pnpm start:dev` and enjoy 🎉
+
+If you love to start from scratch, you can do it by bootstraping a new nestjs application and follow this repository.
+## Localstack
+
+* There are multiple ways to install localstack on your system, go ahead by following the documentation at `https://docs.localstack.cloud/getting-started/installation/`
 
 ## Bootstrap nestjs application
 https://docs.nestjs.com/first-steps
