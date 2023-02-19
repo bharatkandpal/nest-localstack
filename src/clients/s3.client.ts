@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 @Injectable()
-export class S3Util {
-  private readonly logger = new Logger(S3Util.name);
+export class S3Client {
+  private readonly logger = new Logger(S3Client.name);
   private readonly s3Client: S3;
   constructor() {
     this.s3Client = new S3({

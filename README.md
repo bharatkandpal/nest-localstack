@@ -23,7 +23,9 @@ If you love to start from scratch, you can do it by bootstraping a new nestjs ap
 
 ## Bootstrap nestjs application
 https://docs.nestjs.com/first-steps
+
 `npm i -g @nestjs/cli`
+
 `nest new nest-localstack`
 
 <p align="center">

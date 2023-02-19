@@ -3,9 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { FileModule } from './modules/file/file.module';
+import { PostModule } from './modules/post/post.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { DynamodbModule } from './modules/dynamodb/dynamodb.module';
 
 @Module({
-  imports: [FileModule],
+  imports: [FileModule, PostModule, AuthModule, UserModule, DynamodbModule],
   controllers: [AppController],
   providers: [AppService],
 })
