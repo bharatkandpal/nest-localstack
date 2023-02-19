@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { S3Client } from '../utils/aws-s3.util';
+import { S3Client } from '../../clients/s3.client';
 
 @Injectable()
 export class FileService {
