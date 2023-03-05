@@ -1,18 +1,22 @@
 import {
   GetItemCommand,
   GetItemCommandInput,
-  PutItemCommand,
   QueryCommand,
 } from '@aws-sdk/client-dynamodb';
-import { PutCommandInput, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
+import {
+  PutCommand,
+  PutCommandInput,
+  QueryCommandInput,
+} from '@aws-sdk/lib-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DynamoDbClient } from '../../../clients/dynamodb.client';
 import { CreateUserDto } from '../../auth/dto/create-user.dto';
 
+@Injectable()
 export class UserRepository {
-  private readonly tableName = 'users';
+  private readonly tableName = 'xusers';
   constructor(private db: DynamoDbClient) {}
   async find(id: string) {
     const input: GetItemCommandInput = {
@@ -25,7 +29,7 @@ export class UserRepository {
   async findByEmail(email: string) {
     const params: QueryCommandInput = {
       TableName: this.tableName,
-      IndexName: 'applicationScholarshipIdStatusIndex',
+      IndexName: '_idxUserEmail',
       KeyConditionExpression: 'email = :email',
       ExpressionAttributeValues: {
         ':email': {
@@ -35,7 +39,7 @@ export class UserRepository {
     };
     const user = await this.db.getClient().send(new QueryCommand(params));
     if (user.Count == 0) {
-      throw new NotFoundException();
+      return null;
     }
     return unmarshall(user.Items[0]);
   }
@@ -51,7 +55,7 @@ export class UserRepository {
         password: createUserDto.password,
       },
     };
-    const data = await this.db.getClient().send(new PutItemCommand(params));
+    const data = await this.db.getClient().send(new PutCommand(params));
     delete createUserDto.password;
     return { id, ...createUserDto };
   }

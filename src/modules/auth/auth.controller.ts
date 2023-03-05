@@ -29,7 +29,7 @@ export class AuthController {
         .status(HttpStatus.BAD_REQUEST)
         .json({
           message: e.message,
-          data: 'unable to login at the moment',
+          data: 'unable to register at the moment',
           timestamp: Date.now(),
         })
         .send();

@@ -6,8 +6,9 @@ import {
   CreateTableCommand,
 } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
+@Injectable()
 export class DynamoDbClient {
   private readonly logger = new Logger(DynamoDBClient.name);
 
@@ -43,13 +44,16 @@ export class DynamoDbClient {
   }
   async initializeTables(...params: CreateTableInput[]) {
     try {
-      const existingTables = await this.listTables();
-      if (!existingTables || existingTables.TableNames.length === 0) {
+      const existingTables = await (await this.listTables()).TableNames;
+      console.log(existingTables);
+      if (!existingTables || existingTables.length === 0) {
         return this.createTables(params);
       }
+      console.log(params);
       const tablesToCreate = params.filter((p) => {
-        !existingTables.TableNames.includes(p.TableName);
+        return !existingTables.includes(p.TableName);
       });
+      console.log(tablesToCreate);
       return this.createTables(tablesToCreate);
     } catch (e) {
       this.logger.error(e);
@@ -61,6 +65,7 @@ export class DynamoDbClient {
       const createdTables = [];
       for (const tableParams of createTableParams) {
         await this.getClient().send(new CreateTableCommand(tableParams));
+        console.log(tableParams);
         createdTables.push(tableParams.TableName);
       }
       return createdTables;

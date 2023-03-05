@@ -26,13 +26,11 @@ export class AuthService {
       const emailExists = await this.userService.findByEmail(
         createUserDto.email,
       );
-      if (emailExists) {
+      if (emailExists !== null) {
         throw new BadRequestException('Email already exists');
       }
-      console.log(createUserDto);
       createUserDto.password = await bcrypt.hash(createUserDto.password, 5);
       const user = await this.userService.create(createUserDto);
-      console.log(user);
       return this.generateToken(user);
     } catch (e) {
       throw new BadRequestException(e.message);

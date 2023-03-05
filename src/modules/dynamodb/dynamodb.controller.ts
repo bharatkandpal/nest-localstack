@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { DynamoDbService } from './dynamodb.service';
 import { ApiTags } from '@nestjs/swagger';
 @Controller('dynamodb')
@@ -8,5 +8,9 @@ export class DynamoDbController {
   @Post('/initialize')
   async create() {
     return this.dDbService.initializeTables();
+  }
+  @Get()
+  async get() {
+    return this.dDbService.listTables();
   }
 }
