@@ -7,7 +7,7 @@ export class S3Client {
   constructor() {
     this.s3Client = new S3({
       region: process.env.AWS_REGION,
-      endpoint: process.env.DYNAMODB_URL,
+      endpoint: process.env.DYNAMODB_S3_URL,
       s3ForcePathStyle: true,
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,

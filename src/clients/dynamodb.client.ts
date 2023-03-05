@@ -17,15 +17,16 @@ export class DynamoDbClient {
     this.db = new DynamoDBClient({
       region: process.env.AWS_REGION,
       endpoint: process.env.DYNAMODB_URL,
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      },
+      // credentials: {
+      //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      // },
     });
     this.dDbClient = DynamoDBDocumentClient.from(this.db, {
       marshallOptions: {
         removeUndefinedValues: true,
       },
+      unmarshallOptions: { wrapNumbers: true },
     });
   }
   getClient() {

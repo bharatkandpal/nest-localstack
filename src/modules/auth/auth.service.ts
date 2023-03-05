@@ -1,16 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(userService: UserService) {}
-  register(createUserDto: CreateUserDto) {
-    return 'This action registers a new user';
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
+  generateToken(user) {
+    const payload = {
+      id: user.id,
+      email: user.email,
+    };
+    return this.jwtService.sign(payload, {
+      expiresIn: '1h',
+      secret: process.env.JWT_SECRET,
+    });
+  }
+  async register(createUserDto: CreateUserDto) {
+    try {
+      const emailExists = await this.userService.findByEmail(
+        createUserDto.email,
+      );
+      if (emailExists) {
+        throw new BadRequestException('Email already exists');
+      }
+      console.log(createUserDto);
+      createUserDto.password = await bcrypt.hash(createUserDto.password, 5);
+      const user = await this.userService.create(createUserDto);
+      console.log(user);
+      return this.generateToken(user);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
-  login(loginDto: LoginDto) {
-    return 'login the user user';
+  async login(loginDto: LoginDto) {
+    try {
+      const user = await this.userService.findByEmail(loginDto.email);
+      console.log(user);
+      const passwordMatch = await bcrypt.compare(
+        loginDto.password,
+        user.password,
+      );
+      if (!passwordMatch) {
+        throw new BadRequestException('incorrect credentials');
+      }
+      return this.generateToken(user);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }
